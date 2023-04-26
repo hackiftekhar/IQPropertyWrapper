@@ -1,0 +1,37 @@
+{
+  "name": "IQPropertyWrapper",
+  "version": "1.0.0",
+  "source": {
+    "git": "https://github.com/hackiftekhar/IQPropertyWrapper.git",
+    "tag": "1.0.0"
+  },
+  "summary": "Property Wrappers for general use cases.",
+  "homepage": "https://github.com/hackiftekhar/IQPropertyWrapper",
+  "screenshots": "https://raw.githubusercontent.com/hackiftekhar/IQPropertyWrapper/master/Screenshot/IQPropertyWrapperScreenshot.png",
+  "license": "MIT",
+  "authors": {
+    "Iftekhar Qurashi": "hack.iftekhar@gmail.com"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "swift_versions": [
+    "4.2",
+    "5.0",
+    "5.1",
+    "5.2",
+    "5.3",
+    "5.4",
+    "5.5",
+    "5.6"
+  ],
+  "source_files": "IQPropertyWrapper/**/*.{swift}",
+  "frameworks": [
+    "Foundation"
+  ],
+  "libraries": "swiftCoreGraphics",
+  "xcconfig": {
+      "LIBRARY_SEARCH_PATHS": "$(SDKROOT)/usr/lib/swift"
+  },
+  "requires_arc": true
+}

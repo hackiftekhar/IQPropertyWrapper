@@ -1,0 +1,16 @@
+PODS:
+  - IQPropertyWrapper (1.0.0)
+
+DEPENDENCIES:
+  - IQPropertyWrapper (from `.`)
+
+EXTERNAL SOURCES:
+  IQPropertyWrapper:
+    :path: "."
+
+SPEC CHECKSUMS:
+  IQPropertyWrapper: 203edb4f7e9e1caa5ef9f17acae1885bf87d1dba
+
+PODFILE CHECKSUM: 98130fdb5f58e3f4793c69525e4d67d66efc54eb
+
+COCOAPODS: 1.11.3
