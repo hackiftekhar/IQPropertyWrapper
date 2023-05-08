@@ -41,7 +41,7 @@ public struct DoubleValue: Codable, Hashable, Comparable {
             if let value = Double(value) {
                 wrappedValue = value
             } else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect double value but`\(value)` instead")
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect double value but found `\(value)` instead")
             }
         } else if let value = try? container.decode(Bool.self) {
             switch value {

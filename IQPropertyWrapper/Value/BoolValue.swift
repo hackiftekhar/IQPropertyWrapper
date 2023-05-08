@@ -41,7 +41,7 @@ public struct BoolValue: Codable, Hashable {
             switch value.lowercased() {
             case "false", "no", "0", "null", "": wrappedValue = false
             case "true", "yes", "1": wrappedValue = true
-            default: throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect true/false, yes/no or 0/1 but`\(value)` instead")
+            default: throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect true/false, yes/no or 0/1 but found `\(value)` instead")
             }
         } else if let value = try? container.decode(Int.self) {
             switch value {

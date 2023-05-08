@@ -43,7 +43,7 @@ public struct IntValue: Codable, Hashable, Comparable {
             } else if value.isEmpty {
                 wrappedValue = 0
             } else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect integer value but`\(value)` instead")
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect integer value but found `\(value)` instead")
             }
         } else if let value = try? container.decode(Bool.self) {
             switch value {

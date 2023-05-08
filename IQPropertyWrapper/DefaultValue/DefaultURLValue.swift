@@ -1,5 +1,5 @@
 //
-//  DateValue.swift
+//  DefaultURLValue.swift
 // https://github.com/hackiftekhar/IQPropertyWrapper
 // Created by Iftekhar
 //
@@ -24,49 +24,40 @@
 import Foundation
 
 @propertyWrapper
-public struct DateValue: Codable, Hashable, Comparable {
+public struct DefaultURLValue: Codable, Hashable {
 
-    public static var dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        return dateFormatter
-    }()
+    private let defaultValue: URL?
+    private var originalValue: URL?
 
-    public var wrappedValue: Date
+    public var wrappedValue: URL? {
+        get {
+            originalValue ?? defaultValue
+        } set {
+            originalValue = newValue
+        }
+    }
 
-    public init(wrappedValue value: Date) {
-        self.wrappedValue = value
+    public init(wrappedValue value: URL?, defaultValue: URL?) {
+        self.originalValue = value
+        self.defaultValue = defaultValue
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
+        defaultValue = nil
 
-       if let value = try? container.decode(String.self) {
-            if let value = Self.dateFormatter.date(from: value) {
-                wrappedValue = value
-            } else if let value = TimeInterval(value) {
-                wrappedValue = Date(timeIntervalSince1970: value)
-            } else if let value = Int(value) {
-                wrappedValue = Date(timeIntervalSince1970: TimeInterval(value))
-            } else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect date value but found `\(value)` instead")
-            }
-        } else if let value = try? container.decode(Double.self) {
-            wrappedValue = Date(timeIntervalSince1970: value)
-        } else if let value = try? container.decode(Int.self) {
-            wrappedValue = Date(timeIntervalSince1970: TimeInterval(value))
+
+        if let value = try? container.decode(String.self),
+           !value.isEmpty, !value.lowercased().elementsEqual("null"),
+           let url = URL(string: value) {
+            originalValue = url
         } else {
-            wrappedValue = try container.decode(Date.self)
+            originalValue = nil
         }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
-    }
-
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.wrappedValue < rhs.wrappedValue
     }
 }

@@ -14,7 +14,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
 
-        let obj2 = Wrap(key1: true, key2: "something", key3: 3.5, key4: 6, key5: false, key6: 20, key7: nil, key8: "")
+        let obj2 = Wrap(key1: true, key2: "something", key3: 3.5, key4: 6, key5: false, key6: 20, key7: 5, key8: "")
         print(obj2)
 
         do {
@@ -39,12 +39,12 @@ class ViewController: UIViewController {
 }
 
 struct Wrap: Codable {
-    @BoolValue var key1: Bool
-    @StringValue var key2: String
-    @DoubleValue var key3: Double
-    @IntValue var key4: Int
-    @BoolValue var key5: Bool
-    @OptionalIntValue var key6: Int?
-    @DefaultIntValue(defaultValue: 20) var key7: Int = 10
-    @OptionalStringValue var key8: String?
+    @BoolValue                          var key1: Bool
+    @StringValue                        var key2: String
+    @DoubleValue                        var key3: Double
+    @IntValue                           var key4: Int
+    @BoolValue                          var key5: Bool
+    @OptionalIntValue                   var key6: Int?
+    @DefaultIntValue(defaultValue: 20)  var key7: Int = 10
+    @OptionalStringValue                var key8: String?
 }
