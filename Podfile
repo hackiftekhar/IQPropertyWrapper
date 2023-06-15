@@ -1,6 +1,6 @@
 project 'Property Wrappers.xcodeproj'
 
-platform :ios, '9.0'
+platform :ios, '11.0'
 use_frameworks!
 
 target 'Property Wrappers' do
