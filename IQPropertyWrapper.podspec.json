@@ -13,7 +13,7 @@
     "Iftekhar Qurashi": "hack.iftekhar@gmail.com"
   },
   "platforms": {
-      "ios": "11.0"
+      "ios": "11.0",
       "osx": "10.12",
       "tvos": "13.0",
       "watchos": "3.0"
