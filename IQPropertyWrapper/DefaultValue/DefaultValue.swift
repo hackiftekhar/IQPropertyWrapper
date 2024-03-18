@@ -24,12 +24,12 @@
 import Foundation
 
 @propertyWrapper
-public struct DefaultValue<Value> {
+public struct DefaultValue<T> {
 
-    private var originalValue: Value?
-    private let defaultValue: Value
+    private var originalValue: T?
+    private let defaultValue: T?
 
-    public var wrappedValue: Value {
+    public var wrappedValue: T? {
         get {
             originalValue ?? defaultValue
         } set {
@@ -37,17 +37,53 @@ public struct DefaultValue<Value> {
         }
     }
 
-    public init(wrappedValue: Value? = nil, defaultValue: Value) {
+    public init(wrappedValue: T? = nil, defaultValue: T) {
         originalValue = wrappedValue
         self.defaultValue = defaultValue
     }
 }
 
-public extension DefaultValue where Value: Hashable {
+extension DefaultValue: Encodable where T: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.wrappedValue)
+    }
 }
-public extension DefaultValue where Value: Comparable {
+
+extension DefaultValue: Decodable where T: Decodable {
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        originalValue = try? container.decode(T.self)
+        defaultValue = nil
+    }
 }
-public extension DefaultValue where Value: Codable {
+
+extension DefaultValue: Equatable where T: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
 }
-public extension DefaultValue where Value: Decodable {
+
+extension DefaultValue: Hashable where T: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
 }
+
+extension DefaultValue: Comparable where T: Comparable {
+
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if let lhs = lhs.wrappedValue, let rhs = rhs.wrappedValue {
+            return lhs < rhs
+        } else if lhs.wrappedValue != nil {
+            return true
+        } else if rhs.wrappedValue != nil {
+            return false
+        } else {
+            return false
+        }
+    }
+}
+
+extension DefaultValue: Sendable where T: Sendable {}

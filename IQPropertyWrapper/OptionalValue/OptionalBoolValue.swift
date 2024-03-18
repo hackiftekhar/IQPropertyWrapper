@@ -24,13 +24,16 @@
 import Foundation
 
 @propertyWrapper
-public struct OptionalBoolValue: Codable, Hashable {
+public struct OptionalBoolValue {
 
     public var wrappedValue: Bool?
 
     public init(wrappedValue value: Bool?) {
         self.wrappedValue = value
     }
+}
+
+extension OptionalBoolValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -57,9 +60,26 @@ public struct OptionalBoolValue: Codable, Hashable {
             wrappedValue = nil
         }
     }
+}
+
+extension OptionalBoolValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
 }
+
+extension OptionalBoolValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension OptionalBoolValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension OptionalBoolValue: Sendable {}

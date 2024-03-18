@@ -24,13 +24,16 @@
 import Foundation
 
 @propertyWrapper
-public struct OptionalIntValue: Codable, Hashable, Comparable {
+public struct OptionalIntValue {
 
     public var wrappedValue: Int?
 
     public init(wrappedValue value: Int?) {
         self.wrappedValue = value
     }
+}
+
+extension OptionalIntValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -54,12 +57,29 @@ public struct OptionalIntValue: Codable, Hashable, Comparable {
             wrappedValue = nil
         }
     }
+}
+
+extension OptionalIntValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
+}
 
+extension OptionalIntValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension OptionalIntValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension OptionalIntValue: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         if let lhs = lhs.wrappedValue, let rhs = rhs.wrappedValue {
             return lhs < rhs
@@ -73,3 +93,4 @@ public struct OptionalIntValue: Codable, Hashable, Comparable {
     }
 }
 
+extension OptionalIntValue: Sendable {}

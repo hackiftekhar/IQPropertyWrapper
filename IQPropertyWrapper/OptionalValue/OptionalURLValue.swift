@@ -24,13 +24,16 @@
 import Foundation
 
 @propertyWrapper
-public struct OptionalURLValue: Codable, Hashable {
+public struct OptionalURLValue {
 
     public var wrappedValue: URL?
 
     public init(wrappedValue value: URL?) {
         self.wrappedValue = value
     }
+}
+
+extension OptionalURLValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -43,6 +46,9 @@ public struct OptionalURLValue: Codable, Hashable {
             wrappedValue = nil
         }
     }
+}
+
+extension OptionalURLValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -50,3 +56,16 @@ public struct OptionalURLValue: Codable, Hashable {
     }
 }
 
+extension OptionalURLValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension OptionalURLValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension OptionalURLValue: Sendable {}

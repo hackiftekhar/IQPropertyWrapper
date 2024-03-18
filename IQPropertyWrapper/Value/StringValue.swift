@@ -24,13 +24,16 @@
 import Foundation
 
 @propertyWrapper
-public struct StringValue: Codable, Hashable, Comparable {
+public struct StringValue {
 
     public var wrappedValue: String
 
     public init(wrappedValue value: String) {
         self.wrappedValue = value
     }
+}
+
+extension StringValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -50,13 +53,32 @@ public struct StringValue: Codable, Hashable, Comparable {
             wrappedValue = try container.decode(String.self)
         }
     }
+}
+
+extension StringValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
+}
 
+extension StringValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension StringValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension StringValue: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue < rhs.wrappedValue
     }
 }
+
+extension StringValue: Sendable {}

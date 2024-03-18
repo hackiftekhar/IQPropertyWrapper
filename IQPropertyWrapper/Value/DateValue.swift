@@ -24,7 +24,7 @@
 import Foundation
 
 @propertyWrapper
-public struct DateValue: Codable, Hashable, Comparable {
+public struct DateValue {
 
     public static var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -38,6 +38,9 @@ public struct DateValue: Codable, Hashable, Comparable {
     public init(wrappedValue value: Date) {
         self.wrappedValue = value
     }
+}
+
+extension DateValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -60,13 +63,32 @@ public struct DateValue: Codable, Hashable, Comparable {
             wrappedValue = try container.decode(Date.self)
         }
     }
+}
+
+extension DateValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
+}
 
+extension DateValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension DateValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension DateValue: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue < rhs.wrappedValue
     }
 }
+
+extension DateValue: Sendable {}

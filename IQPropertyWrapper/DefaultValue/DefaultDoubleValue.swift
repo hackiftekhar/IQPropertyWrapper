@@ -24,7 +24,7 @@
 import Foundation
 
 @propertyWrapper
-public struct DefaultDoubleValue: Codable, Hashable, Comparable {
+public struct DefaultDoubleValue {
 
     private let defaultValue: Double
     private var originalValue: Double?
@@ -41,6 +41,9 @@ public struct DefaultDoubleValue: Codable, Hashable, Comparable {
         self.originalValue = value
         self.defaultValue = defaultValue
     }
+}
+
+extension DefaultDoubleValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -65,13 +68,32 @@ public struct DefaultDoubleValue: Codable, Hashable, Comparable {
             originalValue = nil
         }
     }
+}
+
+extension DefaultDoubleValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
+}
 
+extension DefaultDoubleValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension DefaultDoubleValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension DefaultDoubleValue: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue < rhs.wrappedValue
     }
 }
+
+extension DefaultDoubleValue: Sendable {}

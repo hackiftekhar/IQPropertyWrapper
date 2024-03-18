@@ -24,13 +24,16 @@
 import Foundation
 
 @propertyWrapper
-public struct URLValue: Codable, Hashable {
+public struct URLValue {
 
     public var wrappedValue: URL
 
     public init(wrappedValue value: URL) {
         self.wrappedValue = value
     }
+}
+
+extension URLValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -43,9 +46,26 @@ public struct URLValue: Codable, Hashable {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expect a URL but found `\(value)` instead")
         }
     }
+}
+
+extension URLValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
 }
+
+extension URLValue: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension URLValue: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension URLValue: Sendable {}

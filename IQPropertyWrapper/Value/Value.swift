@@ -1,5 +1,5 @@
 //
-//  DefaultURLValue.swift
+//  Value.swift
 // https://github.com/hackiftekhar/IQPropertyWrapper
 // Created by Iftekhar
 //
@@ -24,43 +24,24 @@
 import Foundation
 
 @propertyWrapper
-public struct DefaultURLValue {
+public struct Value<T> {
 
-    private let defaultValue: URL?
-    private var originalValue: URL?
+    public var wrappedValue: T
 
-    public var wrappedValue: URL? {
-        get {
-            originalValue ?? defaultValue
-        } set {
-            originalValue = newValue
-        }
-    }
-
-    public init(wrappedValue value: URL?, defaultValue: URL?) {
-        self.originalValue = value
-        self.defaultValue = defaultValue
+    public init(wrappedValue value: T) {
+        self.wrappedValue = value
     }
 }
 
-extension DefaultURLValue: Decodable {
+extension Value: Decodable where T: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        defaultValue = nil
-
-
-        if let value = try? container.decode(String.self),
-           !value.isEmpty, !value.lowercased().elementsEqual("null"),
-           let url = URL(string: value) {
-            originalValue = url
-        } else {
-            originalValue = nil
-        }
+        wrappedValue = try container.decode(T.self)
     }
 }
 
-extension DefaultURLValue: Encodable {
+extension Value: Encodable where T: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -68,16 +49,23 @@ extension DefaultURLValue: Encodable {
     }
 }
 
-extension DefaultURLValue: Equatable {
+extension Value: Equatable where T: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
 
-extension DefaultURLValue: Hashable {
+extension Value: Hashable where T: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(wrappedValue)
     }
 }
 
-extension DefaultURLValue: Sendable {}
+extension Value: Comparable where T: Comparable {
+
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue < rhs.wrappedValue
+    }
+}
+
+extension Value: Sendable where T: Sendable {}

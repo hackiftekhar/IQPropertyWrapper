@@ -1,5 +1,5 @@
 //
-//  DefaultURLValue.swift
+//  OptionalValue.swift
 // https://github.com/hackiftekhar/IQPropertyWrapper
 // Created by Iftekhar
 //
@@ -24,43 +24,24 @@
 import Foundation
 
 @propertyWrapper
-public struct DefaultURLValue {
+public struct OptionalValue<T> {
 
-    private let defaultValue: URL?
-    private var originalValue: URL?
+    public var wrappedValue: T?
 
-    public var wrappedValue: URL? {
-        get {
-            originalValue ?? defaultValue
-        } set {
-            originalValue = newValue
-        }
-    }
-
-    public init(wrappedValue value: URL?, defaultValue: URL?) {
-        self.originalValue = value
-        self.defaultValue = defaultValue
+    public init(wrappedValue value: T?) {
+        self.wrappedValue = value
     }
 }
 
-extension DefaultURLValue: Decodable {
+extension OptionalValue: Decodable where T: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        defaultValue = nil
-
-
-        if let value = try? container.decode(String.self),
-           !value.isEmpty, !value.lowercased().elementsEqual("null"),
-           let url = URL(string: value) {
-            originalValue = url
-        } else {
-            originalValue = nil
-        }
+        wrappedValue = try? container.decode(T.self)
     }
 }
 
-extension DefaultURLValue: Encodable {
+extension OptionalValue: Encodable where T: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -68,16 +49,11 @@ extension DefaultURLValue: Encodable {
     }
 }
 
-extension DefaultURLValue: Equatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.wrappedValue == rhs.wrappedValue
-    }
+extension OptionalValue: Equatable where T: Equatable {
 }
 
-extension DefaultURLValue: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(wrappedValue)
-    }
+extension OptionalValue: Hashable where T: Hashable {
 }
 
-extension DefaultURLValue: Sendable {}
+extension OptionalValue: Comparable where T: Comparable {
+}

@@ -1,5 +1,5 @@
 //
-//  DefaultURLValue.swift
+//  OptionalUserDefault.swift
 // https://github.com/hackiftekhar/IQPropertyWrapper
 // Created by Iftekhar
 //
@@ -24,43 +24,25 @@
 import Foundation
 
 @propertyWrapper
-public struct DefaultURLValue {
+public struct OptionalUserDefault<T: Codable> {
 
-    private let defaultValue: URL?
-    private var originalValue: URL?
-
-    public var wrappedValue: URL? {
+    public let key: String
+    public var userDefaults: UserDefaults = UserDefaults.standard
+    public var wrappedValue: T? {
         get {
-            originalValue ?? defaultValue
+            userDefaults.value(forKey: key) as? T
         } set {
-            originalValue = newValue
-        }
-    }
-
-    public init(wrappedValue value: URL?, defaultValue: URL?) {
-        self.originalValue = value
-        self.defaultValue = defaultValue
-    }
-}
-
-extension DefaultURLValue: Decodable {
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        defaultValue = nil
-
-
-        if let value = try? container.decode(String.self),
-           !value.isEmpty, !value.lowercased().elementsEqual("null"),
-           let url = URL(string: value) {
-            originalValue = url
-        } else {
-            originalValue = nil
+            if let newValue = newValue {
+                userDefaults.set(newValue, forKey: key)
+            } else {
+                userDefaults.removeObject(forKey: key)
+            }
+            userDefaults.synchronize()
         }
     }
 }
 
-extension DefaultURLValue: Encodable {
+extension OptionalUserDefault: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -68,16 +50,30 @@ extension DefaultURLValue: Encodable {
     }
 }
 
-extension DefaultURLValue: Equatable {
+extension OptionalUserDefault: Equatable where T: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
 
-extension DefaultURLValue: Hashable {
+extension OptionalUserDefault: Hashable where T: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(wrappedValue)
     }
 }
 
-extension DefaultURLValue: Sendable {}
+extension OptionalUserDefault: Comparable where T: Comparable {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if let lhs = lhs.wrappedValue, let rhs = rhs.wrappedValue {
+            return lhs < rhs
+        } else if lhs.wrappedValue != nil {
+            return true
+        } else if rhs.wrappedValue != nil {
+            return false
+        } else {
+            return false
+        }
+    }
+}
+
+extension OptionalUserDefault: Sendable where T: Sendable {}

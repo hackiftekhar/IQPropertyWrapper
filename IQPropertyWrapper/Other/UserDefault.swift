@@ -39,21 +39,30 @@ public struct UserDefault<T: Codable> {
     }
 }
 
-@propertyWrapper
-public struct OptionalUserDefault<T: Codable> {
+extension UserDefault: Encodable {
 
-    public let key: String
-    public var userDefaults: UserDefaults = UserDefaults.standard
-    public var wrappedValue: T? {
-        get {
-            userDefaults.value(forKey: key) as? T
-        } set {
-            if let newValue = newValue {
-                userDefaults.set(newValue, forKey: key)
-            } else {
-                userDefaults.removeObject(forKey: key)
-            }
-            userDefaults.synchronize()
-        }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.wrappedValue)
     }
 }
+
+extension UserDefault: Equatable where T: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension UserDefault: Hashable where T: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(wrappedValue)
+    }
+}
+
+extension UserDefault: Comparable where T: Comparable {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue < rhs.wrappedValue
+    }
+}
+
+extension UserDefault: Sendable where T: Sendable {}
