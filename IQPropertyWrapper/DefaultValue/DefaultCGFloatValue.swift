@@ -1,5 +1,5 @@
 //
-//  OptionalValue.swift
+//  DefaultCGFloatValue.swift
 // https://github.com/hackiftekhar/IQPropertyWrapper
 // Created by Iftekhar
 //
@@ -24,24 +24,53 @@
 import Foundation
 
 @propertyWrapper
-public struct OptionalValue<T> {
+public struct DefaultCGFloatValue {
 
-    public var wrappedValue: T?
+    private let defaultValue: CGFloat
+    private var originalValue: CGFloat?
 
-    public init(wrappedValue value: T?) {
-        self.wrappedValue = value
+    public var wrappedValue: CGFloat {
+        get {
+            originalValue ?? defaultValue
+        } set {
+            originalValue = newValue
+        }
+    }
+
+    public init(wrappedValue value: CGFloat?, defaultValue: CGFloat) {
+        self.originalValue = value
+        self.defaultValue = defaultValue
     }
 }
 
-extension OptionalValue: Decodable where T: Decodable {
+extension DefaultCGFloatValue: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        wrappedValue = try? container.decode(T.self)
+        defaultValue = 0.0
+
+        if let value = try? container.decode(CGFloat.self) {
+            originalValue = value
+        } else if let value = try? container.decode(String.self) {
+            if let doubleValue = Double(value) {
+                originalValue = CGFloat(doubleValue)
+            } else {
+                originalValue = nil
+            }
+        } else if let value = try? container.decode(Bool.self) {
+            switch value {
+            case false: originalValue = 0
+            case true: originalValue = 1
+            }
+        } else if let value = try? container.decode(Int.self) {
+            originalValue = CGFloat(value)
+        } else {
+            originalValue = nil
+        }
     }
 }
 
-extension OptionalValue: Encodable where T: Encodable {
+extension DefaultCGFloatValue: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -49,31 +78,22 @@ extension OptionalValue: Encodable where T: Encodable {
     }
 }
 
-extension OptionalValue: Equatable where T: Equatable {
+extension DefaultCGFloatValue: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
 
-extension OptionalValue: Hashable where T: Hashable {
+extension DefaultCGFloatValue: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(wrappedValue)
     }
 }
 
-extension OptionalValue: Comparable where T: Comparable {
-
+extension DefaultCGFloatValue: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
-        if let lhs = lhs.wrappedValue, let rhs = rhs.wrappedValue {
-            return lhs < rhs
-        } else if lhs.wrappedValue != nil {
-            return true
-        } else if rhs.wrappedValue != nil {
-            return false
-        } else {
-            return false
-        }
+        lhs.wrappedValue < rhs.wrappedValue
     }
 }
 
-extension OptionalValue: Sendable where T: Sendable {}
+extension DefaultCGFloatValue: Sendable {}
